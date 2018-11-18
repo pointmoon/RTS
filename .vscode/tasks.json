@@ -1,0 +1,19 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "2_lab",
+            "type": "shell",
+            "command": "gcc",
+            "args": [
+                "2_lab/main.c",
+                "-lpthread",
+                "-lm"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        }
+    ]
+}
