@@ -8,9 +8,10 @@
 #define RESET "\033[0m"
 #define YELLOW  "\033[1;33m"
 #define GREEN  "\033[1;32m"
+#define RED "\033[1;34m"
 
-#define M 3 //Количество писателей
-#define N 3 //Количесвто читателей\
+#define M 5 //Количество писателей
+#define N 10 //Количесвто читателей\
 
 unsigned int iter; //итерация
 sem_t accessM,readresM,orderM; //семафоры
@@ -23,10 +24,15 @@ void *reader(void *prm)
 	for(i;i<iter;i++)
 	{
 
-		if (sem_wait(&orderM)==0) printf("%s%d Читатель %d в очереди__________Ч%d%s\n",YELLOW,i,num1,num1,RESET);	// Помните наш порядок прибытия
+		if (sem_wait(&orderM)==0)
+		{
+			printf("%s%d Читатель %d в очереди__________Ч%d%s\n",YELLOW,i,num1,num1,RESET);	// Помните наш порядок прибытия
+		} 
 		sem_wait(&readresM);				 // Мы можем манипулировать счетчиками читателей
 		if (readers == 0)				// Если в настоящее время нет читателей (мы пришли первым)...
+		{
 			sem_wait(&accessM);				// ..запрашивает эксклюзивный доступ к ресурсу для читателей
+		}
 		readers++;							 // Обратите внимание, что есть еще один читатель
 		sem_post(&orderM);					 // Оформить заказ семафора прибытия (мы обслуживались)
 		sem_post(&readresM);				 // На данный момент мы получили доступ к числу читателей
@@ -37,7 +43,9 @@ void *reader(void *prm)
 		sem_wait(&readresM);				 // Мы можем манипулировать счетчиками читателей
 		readers--;							 // Мы уходим, есть еще один читатель
 		if (readers == 0)				// Если в настоящее время читателей больше нет...
+		{
 			sem_post(&accessM);				// ...rосвободить эксклюзивный доступ к ресурсу
+		}
 		sem_post(&readresM);				 // На данный момент мы получили доступ к числу читателей
 	}
 }
@@ -48,7 +56,10 @@ void *writer(void *prm)
 	int j=0,r;
 	for(j;j<iter;j++)
 	{
-		if(sem_wait(&orderM)==0) printf("%s%d Писатель %d в очереди__________П%d%s\n",GREEN,j,num2,num2,RESET); // Помните наш порядок прибытия
+		if(sem_wait(&orderM)==0)
+		{
+			printf("%s%d Писатель %d в очереди__________П%d%s\n",GREEN,j,num2,num2,RESET); // Помните наш порядок прибытия
+		}
 		sem_wait(&accessM);					// Запросить эксклюзивный доступ к ресурсу
 		sem_post(&orderM);					 // Оформить заказ семафора прибытия (мы обслуживались)
 
@@ -59,11 +70,12 @@ void *writer(void *prm)
 	}
 }
 
-void main()
+int main()
 {
-	pthread_t threadRE[N];
-	pthread_t threadWR[M];
+	pthread_t threadRE[N]; //массив потоков читателей
+	pthread_t threadWR[M]; // массив потоков писателей
 	
+	//инициализация семафоров
 	if(sem_init(&accessM,0,1) != 0){
 		printf("ERROR (sem_init(&accessM,0,1))\n");
 		exit(EXIT_FAILURE);
@@ -108,4 +120,6 @@ void main()
 	sem_destroy(&accessM);
 	sem_destroy(&readresM);
 	sem_destroy(&orderM);
+	printf("All sem a destroy, good buy!\n");
+	return EXIT_SUCCESS;
 }
