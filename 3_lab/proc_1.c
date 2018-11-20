@@ -1,5 +1,8 @@
 #include <sys/types.h>
 #include <sys/mman.h>
+#include <sys/shm.h>
+#include <string.h>
+#include <time.h>
 #include <fcntl.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -28,20 +31,15 @@ int main(){
         return -1;
     }
 
-    //блокируем общую память
-    if(mlock(vaddr, SHM_SIZE) != 0){
-        perror("can`t block shm (mlock)");
-        return -1;
+    while(1){
+        if(strcmp((char*)vaddr, "exit") == 0){
+            //отделяем общую память от адресного пространства процесса
+            munmap(vaddr, SHM_SIZE);
+            close(shm_fd);
+            return 0;       
+        }
+        sprintf(vaddr, "%d", (int)strlen((char*)vaddr));
+        sleep(15);
     }
-
-    //to do
-    vaddr = "Good day!";
-    
-    //отделяем общую память от адресного пространства процесса
-    munmap(vaddr, SHM_SIZE);
-    close(shm_fd);
-    pause();
-    //удаляем сегмент общей памяти
-    shm_unlink("my_shm");
-    return 0;
+    return -1;
 }
