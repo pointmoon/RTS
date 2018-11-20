@@ -12,6 +12,7 @@
 int main(){
     int shm_fd;
     void *vaddr;
+    char exit_string[SHM_SIZE] = "exit\n";
 
     //получаем дескриптор общей памяти
     if((shm_fd=shm_open("my_shm", O_CREAT | O_RDWR, 0666)) == -1){
@@ -31,8 +32,11 @@ int main(){
         return -1;
     }
 
+    sprintf(vaddr, "%s", "\0");
+
     while(1){
-        if(strcmp((char*)vaddr, "exit") == 0){
+        //printf("s1: %s, s2: %s\n", (char*)vaddr, exit_string);
+        if(strcmp((char*)vaddr, exit_string) == 0){
             //отделяем общую память от адресного пространства процесса
             munmap(vaddr, SHM_SIZE);
             close(shm_fd);
