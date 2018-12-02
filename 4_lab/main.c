@@ -1,7 +1,7 @@
 #include <stdio.h>
-#include <unistd.h>
 
 struct task{
+    int number;
     int C; //время выполнения задачи
     int T; //период задачи
     int D; //дедлайн задачи (T = D)
@@ -19,10 +19,13 @@ int main(){
     struct task arrTask[countTask];
     for(int i=0; i<countTask; i++){
         printf("Задача #%d\n",i);
+        arrTask[i].number = i;
         printf("\tC: "); scanf("%d", &arrTask[i].C);
         printf("\tT: "); scanf("%d", &arrTask[i].T);
         arrTask[i].D = arrTask[i].T;
     }
+
+    //вычисление времени моделирования
     int modellingTime = findModelingTime(countTask,arrTask);
     printf("Время моделирования: %d\n", modellingTime);
 
