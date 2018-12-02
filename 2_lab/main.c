@@ -20,7 +20,7 @@ unsigned int readers = 0;	// Количество читателей, обращ
 
 void *reader(void *prm)
 {
-	int num1=*(int*)prm;
+	int num1=(int)prm;
 	int i=0,r;
 	for(i;i<iter;i++)
 	{
@@ -29,19 +29,17 @@ void *reader(void *prm)
 		{
 			printf("%s%d Читатель %d в очереди__________Ч%d%s\n",YELLOW,i,num1,num1,RESET);	// Помните наш порядок прибытия
 		} 
-		sem_wait(&readresM);				 // Мы можем манипулировать счетчиками читателей
-		if (readers == 0)				// Если в настоящее время нет читателей (мы пришли первым)...
+		sem_wait(&readresM);
+		if (readers == 0)
 		{
-			sem_wait(&accessM);				// ..запрашивает эксклюзивный доступ к ресурсу для читателей
+			sem_wait(&accessM);
 			printf("%sЧитатели захватили семафор доступа к ресурсам!%s\n",RED,RESET);
 		}
-		readers++;							 // Обратите внимание, что есть еще один читатель
-		sem_post(&orderM);					 // Оформить заказ семафора прибытия (мы обслуживались)
-		sem_post(&readresM);				 // На данный момент мы получили доступ к числу читателей
+		readers++;				
+		sem_post(&orderM);		
+		sem_post(&readresM);	
 
 		printf("%s%d Работает читатель %d________________Ч%d%s\n",YELLOW,i,num1,num1,RESET);      // Здесь читатель может прочитать ресурс по своему усмотрению
-		r=1+rand()%4;
-		sleep(r);
 		sem_wait(&readresM);				 // Мы можем манипулировать счетчиками читателей
 		readers--;							 // Мы уходим, есть еще один читатель
 		if (readers == 0)				// Если в настоящее время читателей больше нет...
@@ -55,7 +53,7 @@ void *reader(void *prm)
 
 void *writer(void *prm)
 {
-	int num2=*(int*)prm;
+	int num2=(int)prm;
 	int j=0,r;
 	for(j;j<iter;j++)
 	{
@@ -64,14 +62,12 @@ void *writer(void *prm)
 			printf("%s%d Писатель %d в очереди__________П%d%s\n",GREEN,j,num2,num2,RESET); // Помните наш порядок прибытия
 		}
 		sem_wait(&accessM);					// Запросить эксклюзивный доступ к ресурсу
-		printf("%sПисатель захватил семафор доступа к ресурсам!%s\n",BLUE,RESET);
+		printf("%sПисатель %d захватил семафор доступа к ресурсам!%s\n",BLUE,num2,RESET);
 		sem_post(&orderM);					 // Оформить заказ семафора прибытия (мы обслуживались)
 
 		printf("%s%d Работает писатель %d________________П%d%s\n",GREEN,j,num2,num2,RESET); // Здесь писатель может модифицировать ресурс по своему усмотрению
-		r=1+rand()%4;
-		sleep(r);
 		sem_post(&accessM);					// Отключить эксклюзивный доступ к ресурсу
-		printf("%sПисатель освободил семафор доступа к ресурсам!%s\n",BLUE,RESET);
+		printf("%sПисатель %d освободил семафор доступа к ресурсам!%s\n",BLUE,num2,RESET);
 	}
 }
 
@@ -103,13 +99,11 @@ int main()
 	int i;
 	for(i=0;i<M;i++)
 	{
-		pthread_create(&(threadWR[i]),NULL,writer,(void*)&i);
-		sleep(1);
+		pthread_create(&(threadWR[i]),NULL,writer,(void*)i);
 	}
 	for(i=0;i<N;i++)
 	{
-		pthread_create(&(threadRE[i]),NULL,reader,(void*)&i);
-		sleep(1);
+		pthread_create(&(threadRE[i]),NULL,reader,(void*)i);
 	}
 
 

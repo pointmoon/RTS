@@ -35,7 +35,7 @@ int main(){
     sprintf(vaddr, "%s", "\0");
 
     while(1){
-        //printf("s1: %s, s2: %s\n", (char*)vaddr, exit_string);
+        printf("s1: %s, s2: %s\n", (char*)vaddr, exit_string);
         if(strcmp((char*)vaddr, exit_string) == 0){
             //отделяем общую память от адресного пространства процесса
             munmap(vaddr, SHM_SIZE);
