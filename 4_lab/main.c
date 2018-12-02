@@ -1,15 +1,31 @@
 #include <stdio.h>
 #include <unistd.h>
 
-#define N 3
+struct task{
+    int C; //время выполнения задачи
+    int T; //период задачи
+    int D; //дедлайн задачи (T = D)
+};
 
 int nod(int,int); //нахождение НОД (Наибольший общий делитель)
 int nok(int,int); //нахождение НОК (наименьшее общее кратное)
-int findModelingTime(); //нахождение времени моделирования
+int findModelingTime(int, struct task*); //нахождение времени моделирования
 
 int main(){
-    int modellingTime = findModelingTime();
+    int countTask = 0;
+    printf("Моделирование работы алгоритма DM (Deadline monotonic)\n");
+    printf("Введите количество задач (3 <= N <= 10): ");
+    scanf("%d", &countTask);
+    struct task arrTask[countTask];
+    for(int i=0; i<countTask; i++){
+        printf("Задача #%d\n",i);
+        printf("\tC: "); scanf("%d", &arrTask[i].C);
+        printf("\tT: "); scanf("%d", &arrTask[i].T);
+        arrTask[i].D = arrTask[i].T;
+    }
+    int modellingTime = findModelingTime(countTask,arrTask);
     printf("Время моделирования: %d\n", modellingTime);
+
     return 0;
 }
 
@@ -24,17 +40,11 @@ int nok(int a, int b){
 }
 
 //нахождение времени моделирования
-int findModelingTime(){
-    int array[N], tmp_nok = 0;
-
-    printf("Введите %d числа(-ел): ", N);
-    for(int i=0; i<N; i++){
-        array[i] = 0;
-        scanf("%d", &array[i]);
+int findModelingTime(int countTask, struct task* tasks){
+    int array[countTask], tmp_nok = 0;
+    tmp_nok = tasks[0].T;
+    for(int i=1; i<countTask; i++){
+        tmp_nok = nok(tmp_nok,tasks[i].T);
     }
-    
-    tmp_nok = array[0];
-    for(int i=1; i<N; i++){
-        tmp_nok = nok(tmp_nok,array[i]);
-    }
+    return tmp_nok;
 }
