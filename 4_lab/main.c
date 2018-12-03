@@ -6,6 +6,7 @@ struct task{
     int T; //период задачи
     int D; //дедлайн задачи (T = D)
     int prio; //приоритет задачи
+    int deadline; //признак осуществления работы
 };
 
 int nod(int,int); //нахождение НОД (Наибольший общий делитель)
@@ -14,6 +15,7 @@ int findModelingTime(int, struct task*); //нахождение времени �
 void setPrio(int,struct task*); //инициализация приоритетов задач
 void printTasks(int,struct task*); //печать информации о задачах
 int shedulder(int,struct task*,int); //функция - планировщик
+void printOneTask(struct task*); //печать параметров одной задачи
 
 
 int main(){
@@ -103,8 +105,32 @@ void printTasks(int countTask,struct task* tasks){
 }
 
 int shedulder(int countTask, struct task* tasks, int modellingTime){
-    while(modellingTime--){
-       
+    for(int i=1; i<modellingTime+1; i++){
+        printf("Текущее время моделирования: %d\n", i);
+        
+        //перебор задач (смотрим период и пропуск дедлайна)
+        for(int j=0; j<countTask; j++){
+            if(i % tasks[j].T == 0){
+                printf("\tЗадача #%d прошла период\n",tasks[j].number);
+                //проверка на пропуск дедлайна
+                if(tasks[j].deadline == 0){
+                    printf("\tЗадача #%d пропустила дедлайн\n", tasks[j].number);
+                    printf("Моделирование завершено.\n");
+                    return 1;
+                }
+                tasks[j].deadline = 0;
+            }
+        }
+        //
+        //понять кто должен работать
+        //вывести инфо
     }
     return 0;
+}
+
+void printOneTask(struct task* tempTask){
+    printf("\tC:  %d\n", tempTask->C);
+    printf("\tT:  %d\n", tempTask->T);
+    printf("\tD:  %d\n", tempTask->D);
+    printf("\tprio:%d\n", tempTask->prio);
 }
