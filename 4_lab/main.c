@@ -6,7 +6,7 @@ struct task{
     int T; //период задачи
     int D; //дедлайн задачи (T = D)
     int prio; //приоритет задачи
-    int deadline; //признак осуществления работы
+    int work; //признак осуществления работы
 };
 
 int nod(int,int); //нахождение НОД (Наибольший общий делитель)
@@ -31,6 +31,7 @@ int main(){
         printf("\tT: "); scanf("%d", &arrTask[i].T);
         arrTask[i].D = arrTask[i].T;
         arrTask[i].prio = 0;
+        arrTask[i].work = 0;
     }
 
     //вычисление времени моделирования
@@ -68,29 +69,20 @@ int findModelingTime(int countTask, struct task* tasks){
 }
 
 void setPrio(int countTask,struct task* tasks){
-    struct task tmpTasks[countTask], tmpTask;
-    
-    for(int i=0; i<countTask; i++){
-        tmpTasks[i] = tasks[i];
-    }
+    struct task tmpTask;
 
     for(int i=0; i<countTask; i++){
         for(int j=0; j<countTask-1; j++){
-            if(tmpTasks[j].D < tmpTasks[j+1].D){
-                tmpTask =  tmpTasks[j+1];
-                tmpTasks[j+1] = tmpTasks[j];
-                tmpTasks[j] = tmpTask;
+            if(tasks[j].D > tasks[j+1].D){
+                tmpTask =  tasks[j+1];
+                tasks[j+1] = tasks[j];
+                tasks[j] = tmpTask;
             }
         }
     }
 
     for(int i=0; i<countTask; i++){
-        for(int j=0; j<countTask; j++){
-            if(tasks[j].number == tmpTasks[i].number){
-                tasks[j].prio = i;
-                break;
-            }
-        }
+        tasks[i].prio = countTask - i - 1;
     }
 }
 
@@ -105,25 +97,33 @@ void printTasks(int countTask,struct task* tasks){
 }
 
 int shedulder(int countTask, struct task* tasks, int modellingTime){
-    for(int i=1; i<modellingTime+1; i++){
+    for(int i=1; i<modellingTime + 1; i++){
         printf("Текущее время моделирования: %d\n", i);
-        
+
+        for(int j=0; j<countTask; j++){
+            //printf("tasks[j].work = %d tasks[j].C = %d\n",tasks[j].work,tasks[j].C);
+            if(tasks[j].work == tasks[j].C){
+                continue;
+            }
+            printf("\tРаботает задача #%d\n",tasks[j].number);
+            tasks[j].work = tasks[j].work + 1;
+            break;
+        }
+
         //перебор задач (смотрим период и пропуск дедлайна)
         for(int j=0; j<countTask; j++){
             if(i % tasks[j].T == 0){
                 printf("\tЗадача #%d прошла период\n",tasks[j].number);
                 //проверка на пропуск дедлайна
-                if(tasks[j].deadline == 0){
+                if(tasks[j].work < tasks[j].C){
                     printf("\tЗадача #%d пропустила дедлайн\n", tasks[j].number);
                     printf("Моделирование завершено.\n");
                     return 1;
                 }
-                tasks[j].deadline = 0;
+                tasks[j].work = 0;
             }
         }
-        //
-        //понять кто должен работать
-        //вывести инфо
+
     }
     return 0;
 }
