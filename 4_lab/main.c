@@ -1,5 +1,7 @@
 #include <stdio.h>
 
+#define RESET "\033[0m"
+
 struct task{
     int number;
     int C; //время выполнения задачи
@@ -7,6 +9,7 @@ struct task{
     int D; //дедлайн задачи (T = D)
     int prio; //приоритет задачи
     int work; //признак осуществления работы
+    int color; //цвет
 };
 
 int nod(int,int); //нахождение НОД (Наибольший общий делитель)
@@ -26,12 +29,13 @@ int main(){
     struct task arrTask[countTask];
     for(int i=0; i<countTask; i++){
         printf("Задача #%d\n",i);
-        arrTask[i].number = i;
+        arrTask[i].number = i; //номер
         printf("\tC: "); scanf("%d", &arrTask[i].C);
         printf("\tT: "); scanf("%d", &arrTask[i].T);
-        arrTask[i].D = arrTask[i].T;
-        arrTask[i].prio = 0;
-        arrTask[i].work = 0;
+        arrTask[i].D = arrTask[i].T; //период = дедлайн (условие задачи)
+        arrTask[i].prio = 0; //обнуление (убираем мусор)
+        arrTask[i].work = 0; //обнуление (убираем мусор)
+        arrTask[i].color = i+1; //цвет = номер
     }
 
     //вычисление времени моделирования
@@ -103,16 +107,19 @@ int shedulder(int countTask, struct task* tasks, int modellingTime){
         //перебор задач (смотрим период и пропуск дедлайна)
         for(int j=0; j<countTask; j++){
             if(i % tasks[j].T == 0){
+                printf("\033[0;3%dm",tasks[j].color);
                 printf("\tЗадача #%d прошла период\n",tasks[j].number);
+                printf("%s",RESET);
             }
         }
 
         for(int j=0; j<countTask; j++){
-            //printf("tasks[j].work = %d tasks[j].C = %d\n",tasks[j].work,tasks[j].C);
             if(tasks[j].work == tasks[j].C){
                 continue;
             }
+            printf("\033[0;3%dm",tasks[j].color);
             printf("\tРаботает задача #%d\n",tasks[j].number);
+            printf("%s",RESET);
             printOneTask(&tasks[j]);
             tasks[j].work = tasks[j].work + 1;
             break;
@@ -123,7 +130,9 @@ int shedulder(int countTask, struct task* tasks, int modellingTime){
             if(i % tasks[j].T == 0){
                 //проверка на пропуск дедлайна
                 if(tasks[j].work < tasks[j].C){
+                    printf("\033[0;3%dm",tasks[j].color);
                     printf("\tЗадача #%d пропустила дедлайн\n", tasks[j].number);
+                    printf("%s",RESET);
                     printf("Моделирование завершено.\n");
                     return 1;
                 }
@@ -135,9 +144,11 @@ int shedulder(int countTask, struct task* tasks, int modellingTime){
 }
 
 void printOneTask(struct task* tempTask){
+    printf("\033[0;3%dm",tempTask->color);
     printf("\t\tC:  %d\n", tempTask->C);
     printf("\t\tT:  %d\n", tempTask->T);
     printf("\t\tD:  %d\n", tempTask->D);
     printf("\t\tprio:%d\n", tempTask->prio);
     printf("\t\twork:%d (+1)\n", tempTask->work);
+    printf("%s",RESET);
 }
