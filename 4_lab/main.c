@@ -100,12 +100,20 @@ int shedulder(int countTask, struct task* tasks, int modellingTime){
     for(int i=1; i<modellingTime + 1; i++){
         printf("Текущее время моделирования: %d\n", i);
 
+        //перебор задач (смотрим период и пропуск дедлайна)
+        for(int j=0; j<countTask; j++){
+            if(i % tasks[j].T == 0){
+                printf("\tЗадача #%d прошла период\n",tasks[j].number);
+            }
+        }
+
         for(int j=0; j<countTask; j++){
             //printf("tasks[j].work = %d tasks[j].C = %d\n",tasks[j].work,tasks[j].C);
             if(tasks[j].work == tasks[j].C){
                 continue;
             }
             printf("\tРаботает задача #%d\n",tasks[j].number);
+            printOneTask(&tasks[j]);
             tasks[j].work = tasks[j].work + 1;
             break;
         }
@@ -113,7 +121,6 @@ int shedulder(int countTask, struct task* tasks, int modellingTime){
         //перебор задач (смотрим период и пропуск дедлайна)
         for(int j=0; j<countTask; j++){
             if(i % tasks[j].T == 0){
-                printf("\tЗадача #%d прошла период\n",tasks[j].number);
                 //проверка на пропуск дедлайна
                 if(tasks[j].work < tasks[j].C){
                     printf("\tЗадача #%d пропустила дедлайн\n", tasks[j].number);
@@ -123,14 +130,14 @@ int shedulder(int countTask, struct task* tasks, int modellingTime){
                 tasks[j].work = 0;
             }
         }
-
     }
     return 0;
 }
 
 void printOneTask(struct task* tempTask){
-    printf("\tC:  %d\n", tempTask->C);
-    printf("\tT:  %d\n", tempTask->T);
-    printf("\tD:  %d\n", tempTask->D);
-    printf("\tprio:%d\n", tempTask->prio);
+    printf("\t\tC:  %d\n", tempTask->C);
+    printf("\t\tT:  %d\n", tempTask->T);
+    printf("\t\tD:  %d\n", tempTask->D);
+    printf("\t\tprio:%d\n", tempTask->prio);
+    printf("\t\twork:%d (+1)\n", tempTask->work);
 }
